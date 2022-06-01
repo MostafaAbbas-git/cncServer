@@ -1,7 +1,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <ESP8266WiFi.h>
 
 // HTTP libraries
@@ -12,12 +11,13 @@
 
 #include <ArduinoJson.h> //v5.13.5
 
-#define ssid "NETWORK_NAME"
-#define password "NETWORK_PASSWORD"
+#define ssid "Alariny"
+#define password "@01553707075"
 
-const char *instructions_url = "http://192.168.1.13:4000/instructions"; // instructions endpoint
+const char *instructions_url = "http://192.168.222.123:4000/instructions"; // instructions endpoint
 
-const String sending_flag = "GO";
+// const String sending_flag = "GO";
+const int sending_flag = 99;
 
 void setup()
 {
@@ -27,13 +27,13 @@ void setup()
     while (WiFi.status() != WL_CONNECTED)
     {
         delay(500);
-        Serial.print(".");
+        // Serial.print(".");
     }
-    Serial.println("");
-    Serial.print("WiFi Succesfully connected");
-    Serial.println(ssid);
-    Serial.print("\nConnected, IP address: ");
-    Serial.println(WiFi.localIP());
+    // Serial.println("");
+    // Serial.print("WiFi Succesfully connected");
+    // Serial.println(ssid);
+    // Serial.print("\nConnected, IP address: ");
+    // Serial.println(WiFi.localIP());
 }
 
 void loop()
@@ -60,25 +60,21 @@ void loop()
                 String payload = "{}";
                 payload = http.getString();
 
-                StaticJsonBuffer<1024> jsonBuffer;
+                // Serial.print("payload = ");
+                // Serial.println(payload);
 
-                String json = payload;
-                JsonObject &myObject = jsonBuffer.parseObject(json);
+                DynamicJsonBuffer jsonBuffer;
 
-                // Test if parsing succeeds.
-                if (!myObject.success())
-                {
-                    Serial.println("parseObject() failed");
-                    return;
-                }
+                JsonObject &root = jsonBuffer.parseObject(payload);
 
-                Serial.print("json = ");
-                Serial.println(json);
+                JsonArray &state = root["state"];
+                JsonArray &x = root["x"];
+                JsonArray &y = root["y"];
 
-                const int arrayLength = sizeof(myObject["x"]) / sizeof(myObject["x"][0]);
+                const int arrayLength = y.size();
 
-                Serial.print("Length = ");
-                Serial.println(arrayLength);
+                // Serial.print("Length = ");
+                // Serial.println(arrayLength);
 
                 // send starting flag to arduino via serial print to start the communication
                 Serial.println(sending_flag);
@@ -89,21 +85,21 @@ void loop()
 
                 for (int i = 0; i < arrayLength; i++)
                 {
-                    int currentValue = myObject["x"][i];
+                    int currentValue = x[i];
                     Serial.println(currentValue);
                     delay(200);
                 }
 
                 for (int i = 0; i < arrayLength; i++)
                 {
-                    int currentValue = myObject["y"][i];
+                    int currentValue = y[i];
                     Serial.println(currentValue);
                     delay(200);
                 }
 
                 for (int i = 0; i < arrayLength; i++)
                 {
-                    int currentValue = myObject["state"][i];
+                    int currentValue = state[i];
                     Serial.println(currentValue);
                     delay(200);
                 }
@@ -126,6 +122,6 @@ void loop()
     {
         Serial.printf("[HTTP] Unable to connect to server. Wifi not connected.\n");
     }
-    // delay 1 sec before next iteration
-    delay(1000);
+    // delay 10 secs before next iteration
+    delay(10000);
 }
