@@ -1,0 +1,9 @@
+
+Flask
+Flask-Cors
+Flask-PyMongo
+subprocess.run
+simplejson
+scipy
+imageio
+numpy
