@@ -4,6 +4,7 @@ from flask_cors import CORS
 from subprocess import call
 from utils.helper import extract_gcode_file, filter_result,  scale_list, floor_values
 import json
+from PIL import Image
 
 
 app = Flask(__name__)
@@ -26,10 +27,18 @@ def flutter():
 
         print(f"Image recieved and saved successfully in {saved_img_path}")
 
+        img = Image.open(saved_img_path)
+        imResize = img.resize((200, 140), Image.ANTIALIAS)
+
+        resized_img_path = f"./resizedImages/resized_{filename}"
+        imResize.save(resized_img_path, 'JPEG', quality=100)
+
+        print(f"Image resized and saved successfully in {resized_img_path}")
+
         # Convert the saved image to gcode
         gcode_file_path = f"./gcodeFiles/{filename}.gcode"
 
-        call(["py", "image_to_gcode.py", "--input", saved_img_path,
+        call(["py", "image_to_gcode.py", "--input", resized_img_path,
               "--output", gcode_file_path, "--threshold", "100"])
 
         print(f"Gcode file created successfully in {gcode_file_path}")
@@ -75,7 +84,7 @@ def flutter():
 
         # Send result
         return jsonify({
-            'message': "Done"
+            'message': "Your image was uploaded and processed successfully."
         })
 
 
