@@ -15,6 +15,42 @@ def index():
     return "<h1>CNC task (#3)</h1>"
 
 
+def temp():
+    filename = "shapes.jpg"
+    saved_img_path = "./uploadedimages/" + filename
+    # Convert the saved image to gcode
+    gcode_file_path = f"./gcodeFiles/{filename}.gcode"
+
+    call(["py", "image_to_gcode.py", "--input", saved_img_path,
+          "--output", gcode_file_path, "--threshold", "100"])
+
+    # Read the gcode file
+    x_values, y_values, commands = extract_gcode_file(
+        "./gcodeFiles/test.gcode")
+
+    print(f"Gcode file read successfully and x values: {len(x_values)}")
+
+    # Scale results to [0, 400]
+    x_values = scale_list(x_values, 0, 400)
+    y_values = scale_list(y_values, 0, 400)
+
+    # floor all values
+    x_values = floor_values(x_values)
+    y_values = floor_values(y_values)
+
+    result = {
+        "x": x_values,
+        "y": y_values,
+        "state": commands
+    }
+    with open("temp.json", 'w') as json_file:
+        json.dump(result, json_file)
+    return print("done")
+
+
+temp()
+
+
 @app.route('/flutter', methods=["POST"])
 def flutter():
     if request.method == "POST":
