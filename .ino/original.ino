@@ -17,7 +17,8 @@
 //SoftwareSerial toUno(9, 10);
 const char *instructions_url = "http://192.168.43.180:4000/instructions"; // instructions endpoint
 
-const char sending_flag = 'G';
+const String sending_flag = 255;
+//const String sending_flag = "GO";
 
 void setup()
 {
@@ -32,6 +33,7 @@ void setup()
   //   Serial.println("");
   //   Serial.print("WiFi Succesfully connected: ");
   //   Serial.println(ssid);
+  //  toUno.print("FROM ESP");
   //     Serial.print("\nConnected, IP address: ");
   //     Serial.println(WiFi.localIP());
 }
@@ -71,38 +73,38 @@ void loop()
         JsonArray &x = root["x"];
         JsonArray &y = root["y"];
 
-        const int arrayLength = y.size();
+        const char arrayLength = y.size();
 
         // Serial.print("Length = ");
         // Serial.println(arrayLength);
 
 
         // send starting flag to arduino via serial print to start the communication
-        Serial.print(sending_flag);
-        delay(600);
-        
-        
-        Serial.print(arrayLength);
-        delay(200);
+               Serial.println(sending_flag);
+        // Serial.println("GO");
+        //        toUno.write(toUno.read());
+        delay(500);
+        Serial.println(arrayLength);
+        delay(500);
 
-        for (int i = 0; i < arrayLength; i++)
+        for (char i = 0; i < arrayLength; i++)
         {
-          int currentValue = x[i];
-          Serial.print(currentValue);
+          char currentValue = x[i];
+          Serial.println(currentValue);
           delay(200);
         }
 
-        for (int i = 0; i < arrayLength; i++)
+        for (char i = 0; i < arrayLength; i++)
         {
-          int currentValue = y[i];
-          Serial.print(currentValue);
+          char currentValue = y[i];
+          Serial.println(currentValue);
           delay(200);
         }
 
-        for (int i = 0; i < arrayLength; i++)
+        for (char i = 0; i < arrayLength; i++)
         {
-          int currentValue = state[i];
-          Serial.print(currentValue);
+          char currentValue = state[i];
+          Serial.println(currentValue);
           delay(200);
         }
       }
@@ -124,6 +126,6 @@ void loop()
   {
     Serial.printf("[HTTP] Unable to connect to server. Wifi not connected.\n");
   }
-  // delay 4 secs before next iteration
-  delay(4000);
+  // delay 10 secs before next iteration
+  delay(10000);
 }

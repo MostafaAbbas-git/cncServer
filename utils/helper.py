@@ -33,7 +33,7 @@ def filter_result(x_array, y_array, commands_array):
 
         distance = get_distance(x[i], y[i], x[i + 1], y[i + 1])
 
-        if (distance < 30):
+        if (distance < 15):
 
             del x[i + 1]
             del y[i + 1]

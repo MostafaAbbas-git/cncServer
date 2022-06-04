@@ -25,7 +25,6 @@ int my_length = 0;
 char array_length = 0;
 
 Servo myservo;
-SoftwareSerial esp(9, 10);
 
 void setup()
 { // The stepper motor used in the IO pin is set to output
@@ -145,7 +144,7 @@ void slopexy(boolean dirx, boolean diry, int stepsx, int stepsy)
 void get_data_from_stream()
 {
   array_length = 0;
-  array_length = esp.read();
+  array_length = Serial.read();
 
   if (array_length == oldLength)
   {
@@ -156,27 +155,27 @@ void get_data_from_stream()
   oldLength = array_length;
   for (char i = 0; i < array_length; i++)
   {
-    if (esp.read() != -1)
+    if (Serial.read() != -1)
     {
-      x_values[i] = esp.read();
+      x_values[i] = Serial.read();
       my_length += array_length;
     }
   }
 
   for (char i = 0; i < array_length; i++)
   {
-    if (esp.read() != -1)
+    if (Serial.read() != -1)
     {
-      y_values[i] = esp.read();
+      y_values[i] = Serial.read();
       my_length += array_length;
     }
   }
 
   for (char i = 0; i < array_length; i++)
   {
-    if (esp.read() != -1)
+    if (Serial.read() != -1)
     {
-      state[i] = esp.read();
+      state[i] = Serial.read();
       my_length += array_length;
     }
   }
@@ -188,10 +187,10 @@ void loop()
   if (esp.available() >= 0)
   {
 
-    Serial.println(esp.read());
+    Serial.println("avail");
 
     // flag for recieving array sizes
-    starting_flag = esp.read();
+    starting_flag = Serial.read();
     if (starting_flag == 255)
     {
       Serial.println("start recieving data...");

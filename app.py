@@ -48,9 +48,9 @@ def flutter():
 
         print(f"Gcode file read successfully and x values: {len(x_values)}")
 
-        # Scale results to [0, 400]
-        x_values = scale_list(x_values, 0, 400)
-        y_values = scale_list(y_values, 0, 400)
+        # Scale results to [0, 254]
+        x_values = scale_list(x_values, 0, 254)
+        y_values = scale_list(y_values, 0, 254)
 
         print(f"x_values scaled successfully with max value: {max(x_values)}")
 
@@ -122,43 +122,66 @@ def get_instructions():
         "state": state
     })
 
-
 def convert_image_manually():
-    filename = "shapes.jpg"
-    saved_img_path = "./uploadedimages/" + filename
+    saved_img_path = "./test images/star.jpg"
+    filename = "star.jpg"
+    img = Image.open(saved_img_path)
+    imResize = img.resize((200, 140), Image.ANTIALIAS)
+
+    resized_img_path = f"./resizedImages/resized_{filename}"
+    imResize.save(resized_img_path, 'JPEG', quality=100)
+
+    print(f"Image resized and saved successfully in {resized_img_path}")
+
     # Convert the saved image to gcode
     gcode_file_path = f"./gcodeFiles/{filename}.gcode"
 
-    call(["py", "image_to_gcode.py", "--input", saved_img_path,
-          "--output", gcode_file_path, "--threshold", "100"])
+    call(["py", "image_to_gcode.py", "--input", resized_img_path,
+            "--output", gcode_file_path, "--threshold", "100"])
+
+    print(f"Gcode file created successfully in {gcode_file_path}")
 
     # Read the gcode file
-    x_values, y_values, commands = extract_gcode_file(
-        "./gcodeFiles/test.gcode")
+    x_values, y_values, commands = extract_gcode_file(gcode_file_path)
 
     print(f"Gcode file read successfully and x values: {len(x_values)}")
 
-    # Scale results to [0, 400]
-    x_values = scale_list(x_values, 0, 400)
-    y_values = scale_list(y_values, 0, 400)
+    # Scale results to [0, 254]
+    x_values = scale_list(x_values, 0, 200)
+    y_values = scale_list(y_values, 0, 200)
+
+    print(f"x_values scaled successfully with max value: {max(x_values)}")
+
+    # filter results to remove close values
+    x_values, y_values, commands = filter_result(
+        x_values, y_values, commands)
+
+    print(f"x_values filtered successfully, new length: {len(x_values)}")
 
     # floor all values
     x_values = floor_values(x_values)
     y_values = floor_values(y_values)
 
     result = {
-        "x": x_values,
-        "y": y_values,
-        "state": commands
+        'x': x_values,
+        'y': y_values,
+        'state': commands
     }
-    with open("temp.json", 'w') as json_file:
-        json.dump(result, json_file)
-    return print("done")
 
+    # Store result in json file localy
+    result_json_path = f"./instructions/{filename}.json"
+
+    with open(result_json_path, 'w') as json_file:
+        json.dump(result, json_file)
+
+    # Save the last result again in result.json to get it later easily.
+    with open("./instructions/result.json", 'w') as json_file:
+        json.dump(result, json_file)
+
+    print(f"Result stored successfully in {result_json_path}.")
+
+convert_image_manually()
 
 if __name__ == "__main__":
     os.environ['FLASK_ENV'] = 'development'
-
-    # convert_image_manually()
-
-    app.run(debug=True, host="192.168.1.13", port=4000)
+    app.run(debug=True, host="192.168.43.180", port=4000)
