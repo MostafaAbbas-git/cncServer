@@ -15,7 +15,7 @@
 #define password "123456789"
 
 //SoftwareSerial toUno(9, 10);
-const char *instructions_url = "http://192.168.43.180:4000/instructions"; // instructions endpoint
+const char *instructions_url = "http://192.168.1.15:4000/instructions"; // instructions endpoint
 
 const char sending_flag = 'G';
 

@@ -20,18 +20,18 @@ def index():
 def flutter():
     if request.method == "POST":
         # get the image from flutter app
+
         imagefile = request.files['image']
         filename = imagefile.filename
-        saved_img_path = "./uploadedimages/" + filename
+        saved_img_path = "./uploadedimages/" + filename + ".png"
         imagefile.save(saved_img_path)
 
         print(f"Image recieved and saved successfully in {saved_img_path}")
 
         img = Image.open(saved_img_path)
         imResize = img.resize((200, 140), Image.ANTIALIAS)
-
-        resized_img_path = f"./resizedImages/resized_{filename}"
-        imResize.save(resized_img_path, 'JPEG', quality=100)
+        resized_img_path = f"./resizedImages/resized_{filename}.png"
+        imResize.save(resized_img_path, 'PNG', quality=100)
 
         print(f"Image resized and saved successfully in {resized_img_path}")
 
@@ -122,6 +122,7 @@ def get_instructions():
         "state": state
     })
 
+
 def convert_image_manually():
     saved_img_path = "./test images/star.jpg"
     filename = "star.jpg"
@@ -137,7 +138,7 @@ def convert_image_manually():
     gcode_file_path = f"./gcodeFiles/{filename}.gcode"
 
     call(["py", "image_to_gcode.py", "--input", resized_img_path,
-            "--output", gcode_file_path, "--threshold", "100"])
+          "--output", gcode_file_path, "--threshold", "100"])
 
     print(f"Gcode file created successfully in {gcode_file_path}")
 
@@ -180,8 +181,9 @@ def convert_image_manually():
 
     print(f"Result stored successfully in {result_json_path}.")
 
-convert_image_manually()
+
+# convert_image_manually()
 
 if __name__ == "__main__":
     os.environ['FLASK_ENV'] = 'development'
-    app.run(debug=True, host="192.168.43.180", port=4000)
+    app.run(debug=True, host="192.168.1.15", port=4000)
